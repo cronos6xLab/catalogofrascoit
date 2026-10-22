@@ -1,1 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Frascos - Italiana de Fragancias</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #d4af37; /* Dorado elegante */
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --profit-color: #27ae60; /* Verde para la ganancia */
+        }
 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        h1, h2, h3 {
+            text-align: center;
+            color: var(--primary-color);
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        .category-section {
+            margin-bottom: 50px;
+        }
+
+        .category-title {
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            display: inline-block;
+        }
+
+        /* Grid de productos */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        /* Tarjeta de producto */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 250px;
+            background-color: #e9ecef;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #adb5bd;
+            font-weight: bold;
+            border-bottom: 1px solid #dee2e6;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            text-align: left;
+        }
+
+        .product-details {
+            font-size: 0.85rem;
+            color: #777;
+            margin-bottom: 15px;
+            background: #f1f3f5;
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        /* Tabla de precios */
+        .price-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: auto;
+        }
+
+        .price-table th, .price-table td {
+            padding: 8px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+        }
+
+        .price-table th {
+            font-weight: 600;
+            color: #555;
+            background-color: #fafafa;
+        }
+
+        .price-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .cost-price {
+            color: #888;
+            text-decoration: line-through;
+            font-size: 0.85rem;
+        }
+
+        .sell-price {
+            color: var(--profit-color);
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Italiana de Fragancias</h1>
+    <p class="subtitle">Catálogo de Frascos · Nueva Colección (Costos + 30% Ganancia)</p>
+
+    <div id="catalogo"></div>
+
+    <script>
+        // --- CONFIGURACIÓN ---
+        const margenGanancia = 1.30; // Margen del 30% (Costo x 1.30)
+
+        // --- DATOS EXTRAÍDOS DE LOS PDFs ---
+        const productos = [
+            // FRASCOS DE 30 ML
+            { cat: "Frascos de 30 ML", name: "Zafiro", size: "25 ML", ref: "ZAFIRO", caja: "96 pzas", p_detal: 50, p_12: 41, p_1caja: 38, p_6cajas: 32, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 30 ML", name: "Santal", size: "30 ML", ref: "LZ-495 30ML", caja: "120 pzas", p_detal: 50, p_12: 41, p_1caja: 38, p_6cajas: 32, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 30 ML", name: "Cubo", size: "30 ML", ref: "30ml", caja: "120 pzas", p_detal: 50, p_12: 41, p_1caja: 38, p_6cajas: 32, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 30 ML", name: "Dado", size: "30 ML", ref: "dy115-30ml", caja: "108 pzas", p_detal: 50, p_12: 41, p_1caja: 38, p_6cajas: 32, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 30 ML", name: "Valentino", size: "30 ML", ref: "SGO06", caja: "144 pzas", p_detal: 50, p_12: 41, p_1caja: 38, p_6cajas: 32, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 30 ML", name: "Cristal", size: "30 ML", ref: "dy-555 30ml", caja: "120 pzas", p_detal: 50, p_12: 41, p_1caja: 38, p_6cajas: 32, img: "URL_DE_LA_IMAGEN_AQUI" },
+
+            // FRASCOS DE 50 ML
+            { cat: "Frascos de 50 ML", name: "Cubo", size: "50 ML", ref: "50ml", caja: "120 pzas", p_detal: 60, p_12: 51, p_1caja: 47, p_6cajas: 39, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 50 ML", name: "Dado", size: "50 ML", ref: "dy115-50ml", caja: "96 pzas", p_detal: 60, p_12: 51, p_1caja: 47, p_6cajas: 39, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 50 ML", name: "Valentino", size: "50 ML", ref: "SGO06", caja: "120 pzas", p_detal: 60, p_12: 51, p_1caja: 47, p_6cajas: 39, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 50 ML", name: "Cristal", size: "50 ML", ref: "dy-555", caja: "120 pzas", p_detal: 60, p_12: 51, p_1caja: 47, p_6cajas: 39, img: "URL_DE_LA_IMAGEN_AQUI" },
+
+            // FRASCOS DE 75 A 100 ML
+            { cat: "Frascos de 75 a 100 ML", name: "Cuadrado de colores", size: "75 ML", ref: "S3133", caja: "75 pzas", p_detal: 70, p_12: 62, p_1caja: 56, p_6cajas: 50, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 75 a 100 ML", name: "Torre", size: "80 ML", ref: "DYZ-01X", caja: "60 pzas", p_detal: 70, p_12: 62, p_1caja: 56, p_6cajas: 50, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 75 a 100 ML", name: "Singler", size: "100 ML", ref: "3423", caja: "120 pzas", p_detal: 70, p_12: 62, p_1caja: 56, p_6cajas: 50, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 75 a 100 ML", name: "Gema", size: "100 ML", ref: "DYJ-52P", caja: "70 pzas", p_detal: 70, p_12: 62, p_1caja: 56, p_6cajas: 50, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 75 a 100 ML", name: "Cubo", size: "100 ML", ref: "100ml", caja: "80 pzas", p_detal: 70, p_12: 62, p_1caja: 56, p_6cajas: 50, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 75 a 100 ML", name: "Valentino", size: "100 ML", ref: "SGO06", caja: "72 pzas", p_detal: 70, p_12: 62, p_1caja: 56, p_6cajas: 50, img: "URL_DE_LA_IMAGEN_AQUI" },
+
+            // SANTAL 100 LUJO
+            { cat: "Santal 100 Lujo", name: "Santal Lujo", size: "100 ML", ref: "Con tapa, válvula y anillo", caja: "-", p_detal: 175, p_12: 150.50, p_1caja: 137.50, p_6cajas: 119.50, img: "URL_DE_LA_IMAGEN_AQUI" },
+            
+            // PREPARADOS Y RECARGAS
+            { cat: "Preparados y Recargas", name: "Frasco de Lujo 30 ML", size: "30 ML", ref: "Preparado: $150 | Recarga: $100", caja: "-", p_detal: 150, p_12: 150, p_1caja: 150, p_6cajas: 150, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Preparados y Recargas", name: "Frasco de Lujo 50 ML", size: "50 ML", ref: "Preparado: $200 | Recarga: $150", caja: "-", p_detal: 200, p_12: 200, p_1caja: 200, p_6cajas: 200, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Preparados y Recargas", name: "Frasco de Lujo 75 a 100 ML", size: "75-100 ML", ref: "Preparado: $250 | Recarga: $200", caja: "-", p_detal: 250, p_12: 250, p_1caja: 250, p_6cajas: 250, img: "URL_DE_LA_IMAGEN_AQUI" }
+        ];
+
+        // Función para calcular el precio de venta con ganancia
+        function calcularVenta(costo) {
+            if(costo === undefined || costo === null) return "-";
+            return "$" + (costo * margenGanancia).toFixed(2);
+        }
+
+        // Función para renderizar el catálogo
+        function renderizarCatalogo() {
+            const contenedor = document.getElementById('catalogo');
+            let htmlContent = '';
+            let currentCategory = '';
+
+            productos.forEach(prod => {
+                // Crear sección si cambia la categoría
+                if (prod.cat !== currentCategory) {
+                    if (currentCategory !== '') {
+                        htmlContent += `</div></div>`; // Cerrar sección anterior
+                    }
+                    currentCategory = prod.cat;
+                    htmlContent += `
+                        <div class="category-section">
+                            <h2 class="category-title">${currentCategory}</h2>
+                            <div class="grid-container">
+                    `;
+                }
+
+                // Etiqueta de imagen (si no hay URL, muestra un texto)
+                let imgTag = prod.img === "URL_DE_LA_IMAGEN_AQUI" 
+                    ? `<div class="image-placeholder">🖼️ Pega la URL de la imagen aquí</div>`
+                    : `<img src="${prod.img}" alt="${prod.name}" class="image-placeholder">`;
+
+                // Renderizar la tarjeta del producto
+                htmlContent += `
+                    <div class="card">
+                        ${imgTag}
+                        <div class="card-content">
+                            <div class="product-name">${prod.name} <span style="color:var(--secondary-color); font-size:1rem;">${prod.size}</span></div>
+                            <div class="product-details">
+                                <strong>Ref:</strong> ${prod.ref} <br>
+                                <strong>Caja:</strong> ${prod.caja}
+                            </div>
+                            <table class="price-table">
+                                <thead>
+                                    <tr>
+                                        <th>Cantidad</th>
+                                        <th>Costo</th>
+                                        <th>Venta (+30%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Detal</td>
+                                        <td class="cost-price">$${prod.p_detal}</td>
+                                        <td class="sell-price">${calcularVenta(prod.p_detal)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>12 Pzas</td>
+                                        <td class="cost-price">$${prod.p_12}</td>
+                                        <td class="sell-price">${calcularVenta(prod.p_12)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>1 Caja</td>
+                                        <td class="cost-price">$${prod.p_1caja}</td>
+                                        <td class="sell-price">${calcularVenta(prod.p_1caja)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>6 Cajas+</td>
+                                        <td class="cost-price">$${prod.p_6cajas}</td>
+                                        <td class="sell-price">${calcularVenta(prod.p_6cajas)}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Cerrar la última sección
+            if (currentCategory !== '') {
+                htmlContent += `</div></div>`;
+            }
+
+            contenedor.innerHTML = htmlContent;
+        }
+
+        // Ejecutar al cargar la página
+        document.addEventListener('DOMContentLoaded', renderizarCatalogo);
+    </script>
+</body>
+</html>
