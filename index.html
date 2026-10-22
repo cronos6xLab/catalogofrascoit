@@ -3,169 +3,345 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo de Frascos - Italiana de Fragancias</title>
+    <title>Catálogo de Frascos — Italiana de Fragancias</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
     <style>
+        /* ============ TOKENS (shadcn/ui style reference) ============ */
         :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #d4af37; /* Dorado elegante */
-            --bg-color: #f8f9fa;
-            --card-bg: #ffffff;
-            --text-color: #333;
-            --profit-color: #27ae60; /* Verde para la ganancia */
+            --canvas: #f5f5f5;
+            --paper: #ffffff;
+            --surface-alt: #fafafa;
+            --ink: #0a0a0a;
+            --ink-soft: #171717;
+            --mid-gray: #737373;
+            --hairline: #e5e5e5;
+
+            --radius-card: 24px;
+            --radius-pill: 18px;
+
+            --shadow-card:
+                0 0 0 1px rgba(23, 23, 23, 0.05),
+                0 1px 3px rgba(0, 0, 0, 0.1),
+                0 1px 2px -1px rgba(0, 0, 0, 0.1);
+
+            --font-sans: 'Geist', 'Inter', ui-sans-serif, system-ui, -apple-system,
+                         'Segoe UI', Roboto, sans-serif;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            padding: 20px;
+            background: var(--canvas);
+            color: var(--ink);
+            font-family: var(--font-sans);
+            font-size: 14px;
+            line-height: 1.43;
+            -webkit-font-smoothing: antialiased;
         }
 
-        h1, h2, h3 {
-            text-align: center;
-            color: var(--primary-color);
+        /* ============ PAGE ============ */
+        .page {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 48px 24px 96px;
+        }
+
+        /* ============ HEADER ============ */
+        .page-header { margin-bottom: 48px; }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--mid-gray);
+            margin-bottom: 16px;
+        }
+
+        .eyebrow::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--ink);
         }
 
         h1 {
-            margin-bottom: 10px;
-            font-size: 2.2rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            font-size: clamp(32px, 5vw, 48px);
+            line-height: 1.1;
+            letter-spacing: -0.05em;
+            font-weight: 600;
+            color: var(--ink);
         }
 
         .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 40px;
-            font-size: 1.1rem;
+            margin-top: 12px;
+            max-width: 640px;
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--mid-gray);
         }
 
-        .category-section {
-            margin-bottom: 50px;
+        /* ============ SECTIONS ============ */
+        .category-section { margin-bottom: 64px; }
+        .category-section:last-child { margin-bottom: 0; }
+
+        .category-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--hairline);
         }
 
         .category-title {
-            border-bottom: 2px solid var(--secondary-color);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-            display: inline-block;
+            font-size: 24px;
+            line-height: 1.33;
+            letter-spacing: -0.025em;
+            font-weight: 600;
         }
 
-        /* Grid de productos */
+        .category-meta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* ============ BADGES ============ */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: var(--radius-pill);
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 1.33;
+            white-space: nowrap;
+        }
+
+        .badge-soft { background: var(--canvas); color: var(--ink-soft); }
+        .badge-outline { border: 1px solid var(--hairline); color: var(--ink); }
+        .badge-dark { background: var(--ink-soft); color: #fafafa; }
+
+        /* ============ GRID ============ */
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+            gap: 16px;
         }
 
-        /* Tarjeta de producto */
+        /* ============ CARD ============ */
         .card {
-            background-color: var(--card-bg);
-            border-radius: 12px;
+            background: var(--paper);
+            border: 1px solid var(--hairline);
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-card);
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            transition: transform 0.3s, box-shadow 0.3s;
             display: flex;
             flex-direction: column;
+            transition: box-shadow 0.2s ease;
         }
 
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow:
+                0 0 0 1px rgba(23, 23, 23, 0.08),
+                0 4px 12px rgba(0, 0, 0, 0.08),
+                0 2px 4px -1px rgba(0, 0, 0, 0.08);
         }
 
-        .image-placeholder {
-            width: 100%;
-            height: 250px;
-            background-color: #e9ecef;
+        .product-media {
+            height: 200px;
+            background: var(--canvas);
             display: flex;
-            justify-content: center;
             align-items: center;
-            color: #adb5bd;
-            font-weight: bold;
-            border-bottom: 1px solid #dee2e6;
+            justify-content: center;
+            color: var(--mid-gray);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--hairline);
+        }
+
+        .product-media img {
+            width: 100%;
+            height: 100%;
             object-fit: cover;
+            display: block;
         }
 
         .card-content {
             padding: 20px;
-            flex-grow: 1;
             display: flex;
             flex-direction: column;
+            gap: 12px;
+            flex-grow: 1;
+        }
+
+        .product-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
         .product-name {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-bottom: 5px;
-            text-align: left;
+            font-size: 18px;
+            line-height: 1.33;
+            letter-spacing: -0.01em;
+            font-weight: 600;
+            color: var(--ink);
         }
 
         .product-details {
-            font-size: 0.85rem;
-            color: #777;
-            margin-bottom: 15px;
-            background: #f1f3f5;
-            padding: 8px;
-            border-radius: 6px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--mid-gray);
         }
 
-        /* Tabla de precios */
+        /* ============ PRICE TABLE ============ */
         .price-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: auto;
         }
 
-        .price-table th, .price-table td {
-            padding: 8px;
-            text-align: center;
-            border-bottom: 1px solid #eee;
-            font-size: 0.9rem;
-        }
-
         .price-table th {
-            font-weight: 600;
-            color: #555;
-            background-color: #fafafa;
+            padding: 6px 0 8px;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            text-align: right;
+            color: var(--mid-gray);
+            border-bottom: 1px solid var(--hairline);
         }
 
-        .price-table tr:last-child td {
-            border-bottom: none;
+        .price-table th:first-child { text-align: left; }
+
+        .price-table td {
+            padding: 9px 0;
+            font-size: 14px;
+            text-align: right;
+            color: var(--ink);
+            border-bottom: 1px solid var(--hairline);
         }
+
+        .price-table td:first-child {
+            text-align: left;
+            font-size: 13px;
+            color: var(--mid-gray);
+        }
+
+        .price-table tr:last-child td { border-bottom: none; }
 
         .cost-price {
-            color: #888;
-            text-decoration: line-through;
-            font-size: 0.85rem;
+            font-weight: 500;
+            font-variant-numeric: tabular-nums;
+            color: var(--ink-soft);
+            text-decoration: none; /* sin tachado */
+        }
+
+        /* Columna de venta oculta hasta pulsar el botón */
+        .price-table th.venta-col,
+        .price-table td.sell-price { display: none; }
+
+        .card.venta-visible .price-table th.venta-col,
+        .card.venta-visible .price-table td.sell-price {
+            display: table-cell;
+            animation: ventaFade 0.25s ease both;
         }
 
         .sell-price {
-            color: var(--profit-color);
-            font-weight: bold;
-            font-size: 1rem;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            color: var(--ink);
         }
 
+        @keyframes ventaFade {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        /* ============ BUTTON ============ */
+        .btn-venta {
+            appearance: none;
+            width: 100%;
+            border: 1px solid var(--hairline);
+            background: transparent;
+            color: var(--ink);
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 500;
+            line-height: 1;
+            padding: 10px 16px;
+            border-radius: var(--radius-pill);
+            cursor: pointer;
+            transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+        }
+
+        .btn-venta:hover { background: var(--canvas); }
+
+        .btn-venta:focus-visible {
+            outline: 2px solid var(--ink);
+            outline-offset: 2px;
+        }
+
+        .card.venta-visible .btn-venta {
+            background: var(--ink);
+            border-color: var(--ink);
+            color: #fafafa;
+        }
+
+        .card.venta-visible .btn-venta:hover {
+            background: var(--ink-soft);
+            border-color: var(--ink-soft);
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 600px) {
+            .page { padding: 32px 16px 64px; }
+            .page-header { margin-bottom: 32px; }
+            .category-section { margin-bottom: 48px; }
+        }
     </style>
 </head>
 <body>
 
-    <h1>Italiana de Fragancias</h1>
-    <p class="subtitle">Catálogo de Frascos · Nueva Colección (Costos + 30% Ganancia)</p>
+    <div class="page">
+        <header class="page-header">
+            <span class="eyebrow">
+                Catálogo de frascos · <span id="total-modelos">0</span> modelos
+            </span>
+            <h1>Italiana de Fragancias</h1>
+            <p class="subtitle">
+                Nueva colección. Precios de costo y venta sugerida con margen del 50%
+                (100% en preparados y recargas).
+            </p>
+        </header>
 
-    <div id="catalogo"></div>
+        <main id="catalogo"></main>
+    </div>
 
     <script>
-        // --- CONFIGURACIÓN ---
-        const margenGanancia = 1.30; // Margen del 30% (Costo x 1.30)
+        // --- CONFIGURACIÓN DE MÁRGENES ---
+        const MARGEN_ESTANDAR = 1.50;   // +50% para todo el catálogo
+        const MARGEN_PREPARADOS = 2.00; // +100% para preparados y recargas
+        const CAT_PREPARADOS = "Preparados y Recargas";
 
         // --- DATOS EXTRAÍDOS DE LOS PDFs ---
         const productos = [
@@ -193,99 +369,139 @@
 
             // SANTAL 100 LUJO
             { cat: "Santal 100 Lujo", name: "Santal Lujo", size: "100 ML", ref: "Con tapa, válvula y anillo", caja: "-", p_detal: 175, p_12: 150.50, p_1caja: 137.50, p_6cajas: 119.50, img: "URL_DE_LA_IMAGEN_AQUI" },
-            
-            // PREPARADOS Y RECARGAS
-            { cat: "Preparados y Recargas", name: "Frasco de Lujo 30 ML", size: "30 ML", ref: "Preparado: $150 | Recarga: $100", caja: "-", p_detal: 150, p_12: 150, p_1caja: 150, p_6cajas: 150, img: "URL_DE_LA_IMAGEN_AQUI" },
-            { cat: "Preparados y Recargas", name: "Frasco de Lujo 50 ML", size: "50 ML", ref: "Preparado: $200 | Recarga: $150", caja: "-", p_detal: 200, p_12: 200, p_1caja: 200, p_6cajas: 200, img: "URL_DE_LA_IMAGEN_AQUI" },
-            { cat: "Preparados y Recargas", name: "Frasco de Lujo 75 a 100 ML", size: "75-100 ML", ref: "Preparado: $250 | Recarga: $200", caja: "-", p_detal: 250, p_12: 250, p_1caja: 250, p_6cajas: 250, img: "URL_DE_LA_IMAGEN_AQUI" }
+
+            // PREPARADOS Y RECARGAS (sin descuento por cantidad, venta +100%)
+            { cat: CAT_PREPARADOS, name: "Frasco de Lujo 30 ML", size: "30 ML", ref: "Preparado: $150 | Recarga: $100", caja: "-", p_detal: 150, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: CAT_PREPARADOS, name: "Frasco de Lujo 50 ML", size: "50 ML", ref: "Preparado: $200 | Recarga: $150", caja: "-", p_detal: 200, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: CAT_PREPARADOS, name: "Frasco de Lujo 75 a 100 ML", size: "75-100 ML", ref: "Preparado: $250 | Recarga: $200", caja: "-", p_detal: 250, img: "URL_DE_LA_IMAGEN_AQUI" }
         ];
 
-        // Función para calcular el precio de venta con ganancia
-        function calcularVenta(costo) {
-            if(costo === undefined || costo === null) return "-";
-            return "$" + (costo * margenGanancia).toFixed(2);
+        // --- HELPERS ---
+        function money(n) {
+            if (n === undefined || n === null) return "—";
+            const num = Number(n);
+            if (Number.isNaN(num)) return "—";
+            return "$" + num.toFixed(2).replace(/\.00$/, "");
         }
 
-        // Función para renderizar el catálogo
+        function getMargen(cat) {
+            return cat === CAT_PREPARADOS ? MARGEN_PREPARADOS : MARGEN_ESTANDAR;
+        }
+
+        function calcularVenta(costo, margen) {
+            if (costo === undefined || costo === null) return "—";
+            return money(costo * margen);
+        }
+
+        function filaPrecio(label, costo, margen) {
+            return `
+                <tr>
+                    <td>${label}</td>
+                    <td class="cost-price">${money(costo)}</td>
+                    <td class="sell-price">${calcularVenta(costo, margen)}</td>
+                </tr>
+            `;
+        }
+
+        // --- RENDER ---
         function renderizarCatalogo() {
             const contenedor = document.getElementById('catalogo');
-            let htmlContent = '';
+
+            const counts = productos.reduce((acc, p) => {
+                acc[p.cat] = (acc[p.cat] || 0) + 1;
+                return acc;
+            }, {});
+
+            const totalModelos = document.getElementById('total-modelos');
+            if (totalModelos) totalModelos.textContent = productos.length;
+
+            let html = '';
             let currentCategory = '';
 
             productos.forEach(prod => {
-                // Crear sección si cambia la categoría
+                // Nueva sección si cambia la categoría
                 if (prod.cat !== currentCategory) {
-                    if (currentCategory !== '') {
-                        htmlContent += `</div></div>`; // Cerrar sección anterior
-                    }
+                    if (currentCategory !== '') html += `</div></section>`;
                     currentCategory = prod.cat;
-                    htmlContent += `
-                        <div class="category-section">
-                            <h2 class="category-title">${currentCategory}</h2>
+                    const n = counts[currentCategory];
+                    const margenCat = getMargen(currentCategory);
+                    const margenLabel = currentCategory === CAT_PREPARADOS
+                        ? "+100%"
+                        : "+50%";
+                    html += `
+                        <section class="category-section">
+                            <div class="category-head">
+                                <h2 class="category-title">${currentCategory}</h2>
+                                <div class="category-meta">
+                                    <span class="badge badge-dark">Venta ${margenLabel}</span>
+                                    <span class="badge badge-soft">${n} ${n === 1 ? 'modelo' : 'modelos'}</span>
+                                </div>
+                            </div>
                             <div class="grid-container">
                     `;
                 }
 
-                // Etiqueta de imagen (si no hay URL, muestra un texto)
-                let imgTag = prod.img === "URL_DE_LA_IMAGEN_AQUI" 
-                    ? `<div class="image-placeholder">🖼️ Pega la URL de la imagen aquí</div>`
-                    : `<img src="${prod.img}" alt="${prod.name}" class="image-placeholder">`;
+                const margen = getMargen(prod.cat);
+                const esPreparado = prod.cat === CAT_PREPARADOS;
 
-                // Renderizar la tarjeta del producto
-                htmlContent += `
-                    <div class="card">
-                        ${imgTag}
+                const media = prod.img === "URL_DE_LA_IMAGEN_AQUI"
+                    ? `<div class="product-media">Imagen del producto</div>`
+                    : `<div class="product-media"><img src="${prod.img}" alt="${prod.name}" loading="lazy"></div>`;
+
+                // Preparados y recargas: solo fila Detal
+                const filas = esPreparado
+                    ? filaPrecio('Detal', prod.p_detal, margen)
+                    : filaPrecio('Detal', prod.p_detal, margen)
+                      + filaPrecio('12 pzas', prod.p_12, margen)
+                      + filaPrecio('1 caja', prod.p_1caja, margen)
+                      + filaPrecio('6 cajas+', prod.p_6cajas, margen);
+
+                html += `
+                    <article class="card">
+                        ${media}
                         <div class="card-content">
-                            <div class="product-name">${prod.name} <span style="color:var(--secondary-color); font-size:1rem;">${prod.size}</span></div>
+                            <div class="product-title-row">
+                                <h3 class="product-name">${prod.name}</h3>
+                                <span class="badge badge-outline">${prod.size}</span>
+                            </div>
                             <div class="product-details">
-                                <strong>Ref:</strong> ${prod.ref} <br>
-                                <strong>Caja:</strong> ${prod.caja}
+                                <span>Ref · ${prod.ref}</span>
+                                ${prod.caja !== '-' ? `<span class="badge badge-soft">Caja · ${prod.caja}</span>` : ''}
                             </div>
                             <table class="price-table">
                                 <thead>
                                     <tr>
                                         <th>Cantidad</th>
                                         <th>Costo</th>
-                                        <th>Venta (+30%)</th>
+                                        <th class="venta-col">Venta</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>Detal</td>
-                                        <td class="cost-price">$${prod.p_detal}</td>
-                                        <td class="sell-price">${calcularVenta(prod.p_detal)}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>12 Pzas</td>
-                                        <td class="cost-price">$${prod.p_12}</td>
-                                        <td class="sell-price">${calcularVenta(prod.p_12)}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>1 Caja</td>
-                                        <td class="cost-price">$${prod.p_1caja}</td>
-                                        <td class="sell-price">${calcularVenta(prod.p_1caja)}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>6 Cajas+</td>
-                                        <td class="cost-price">$${prod.p_6cajas}</td>
-                                        <td class="sell-price">${calcularVenta(prod.p_6cajas)}</td>
-                                    </tr>
+                                    ${filas}
                                 </tbody>
                             </table>
+                            <button class="btn-venta" type="button" data-toggle-venta aria-pressed="false">
+                                Venta sugerida
+                            </button>
                         </div>
-                    </div>
+                    </article>
                 `;
             });
 
-            // Cerrar la última sección
-            if (currentCategory !== '') {
-                htmlContent += `</div></div>`;
-            }
+            if (currentCategory !== '') html += `</div></section>`;
 
-            contenedor.innerHTML = htmlContent;
+            contenedor.innerHTML = html;
+
+            // Un solo listener (delegación de eventos)
+            contenedor.addEventListener('click', (e) => {
+                const btn = e.target.closest('[data-toggle-venta]');
+                if (!btn) return;
+                const card = btn.closest('.card');
+                const activo = card.classList.toggle('venta-visible');
+                btn.setAttribute('aria-pressed', String(activo));
+            });
         }
 
-        // Ejecutar al cargar la página
         document.addEventListener('DOMContentLoaded', renderizarCatalogo);
     </script>
 </body>
