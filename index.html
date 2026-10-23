@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Catálogo de Frascos — Italiana de Fragancias</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,7 @@
             --ink-soft: #171717;
             --mid-gray: #737373;
             --hairline: #e5e5e5;
-            --accent: #2563eb; /* Azul profesional para acciones */
+            --accent: #2563eb;
             --accent-soft: #eff6ff;
             --success: #16a34a;
 
@@ -42,6 +42,8 @@
             font-size: 14px;
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
+            /* Previene zoom global en iOS */
+            touch-action: manipulation; 
         }
 
         /* ============ PAGE ============ */
@@ -117,6 +119,7 @@
             color: var(--mid-gray);
             width: 18px;
             height: 18px;
+            pointer-events: none;
         }
 
         .search-input {
@@ -125,9 +128,11 @@
             border: 1px solid var(--hairline);
             border-radius: var(--radius-pill);
             font-family: inherit;
-            font-size: 14px;
+            /* IMPORTANTE: 16px previene el auto-zoom en iOS Safari al hacer focus */
+            font-size: 16px; 
             background: var(--surface-alt);
             transition: all 0.2s ease;
+            -webkit-appearance: none;
         }
 
         .search-input:focus {
@@ -183,6 +188,7 @@
             font-weight: 600;
             font-size: 13px;
             color: var(--ink-soft);
+            white-space: nowrap;
         }
 
         .btn-print {
@@ -354,7 +360,6 @@
 
         .price-table tr:last-child td { border-bottom: none; }
         
-        /* Highlight bulk price */
         .price-table tr.bulk-row td {
             font-weight: 600;
             color: var(--ink-soft);
@@ -379,6 +384,29 @@
             to   { opacity: 1; transform: translateY(0); }
         }
 
+        .btn-venta {
+            width: 100%; 
+            padding: 10px; 
+            border-radius: var(--radius-pill); 
+            border: 1px solid var(--hairline); 
+            background: transparent; 
+            color: var(--ink); 
+            font-family: inherit;
+            font-weight: 600; 
+            font-size: 13px;
+            cursor: pointer; 
+            transition: all 0.2s;
+        }
+        .btn-venta:hover { background: var(--surface-alt); }
+        .card.venta-visible .btn-venta {
+            background: var(--ink-soft);
+            border-color: var(--ink-soft);
+            color: #fff;
+        }
+        .card.venta-visible .btn-venta:hover {
+            background: var(--ink);
+        }
+
         /* ============ TOAST NOTIFICATION ============ */
         .toast {
             position: fixed;
@@ -398,6 +426,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            pointer-events: none;
         }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
@@ -412,9 +441,9 @@
         @media print {
             body { background: white; color: black; }
             .page { padding: 0; max-width: 100%; }
-            .controls, .btn-venta, .copy-btn { display: none !important; }
+            .controls, .btn-venta, .copy-btn, .toast { display: none !important; }
             .card { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
-            .category-head { position: static; background: white; border-bottom: 2px solid black; }
+            .category-head { position: static; background: white; backdrop-filter: none; border-bottom: 2px solid black; }
             .price-table th.venta-col, .price-table td.sell-price { display: table-cell !important; }
             .product-media { height: 120px; }
         }
@@ -438,7 +467,7 @@
                     <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
-                    <input type="search" id="search-input" class="search-input" placeholder="Buscar por nombre, referencia o tamaño (ej: Zafiro, 30ml)...">
+                    <input type="search" id="search-input" class="search-input" placeholder="Buscar por nombre, referencia o tamaño..." autocomplete="off">
                 </div>
                 
                 <div class="toggle-wrapper">
@@ -470,29 +499,43 @@
         const MARGEN_PREPARADOS = 2.00;
         const CAT_PREPARADOS = "Preparados y Recargas";
 
-        // SVG Placeholder elegante para cuando no hay imagen
         const SVG_PLACEHOLDER = `
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
             </svg>
         `;
 
+        // ✅ LISTA COMPLETA RESTAURADA (20 productos)
         const productos = [
-            { cat: "Frascos de 30 ML", name: "Zafiro", size: "25 ML", ref: "ZAFIRO", caja: "96 pzas", p_detal: 50, p_12: 41, p_1caja: 38, p_6cajas: 32, img: "" },
-            { cat: "Frascos de 30 ML", name: "Santal", size: "30 ML", ref: "LZ-495 30ML", caja: "120 pzas", p_detal: 50, p_12: 41, p_1caja: 38, p_6cajas: 32, img: "" },
-            { cat: "Frascos de 30 ML", name: "Cubo", size: "30 ML", ref: "30ml", caja: "120 pzas", p_detal: 50, p_12: 41, p_1caja: 38, p_6cajas: 32, img: "" },
-            { cat: "Frascos de 30 ML", name: "Dado", size: "30 ML", ref: "dy115-30ml", caja: "108 pzas", p_detal: 50, p_12: 41, p_1caja: 38, p_6cajas: 32, img: "" },
-            { cat: "Frascos de 30 ML", name: "Valentino", size: "30 ML", ref: "SGO06", caja: "144 pzas", p_detal: 50, p_12: 41, p_1caja: 38, p_6cajas: 32, img: "" },
-            { cat: "Frascos de 30 ML", name: "Cristal", size: "30 ML", ref: "dy-555 30ml", caja: "120 pzas", p_detal: 50, p_12: 41, p_1caja: 38, p_6cajas: 32, img: "" },
-            { cat: "Frascos de 50 ML", name: "Cubo", size: "50 ML", ref: "50ml", caja: "120 pzas", p_detal: 60, p_12: 51, p_1caja: 47, p_6cajas: 39, img: "" },
-            { cat: "Frascos de 50 ML", name: "Dado", size: "50 ML", ref: "dy115-50ml", caja: "96 pzas", p_detal: 60, p_12: 51, p_1caja: 47, p_6cajas: 39, img: "" },
-            { cat: "Frascos de 50 ML", name: "Valentino", size: "50 ML", ref: "SGO06", caja: "120 pzas", p_detal: 60, p_12: 51, p_1caja: 47, p_6cajas: 39, img: "" },
-            { cat: "Frascos de 75 a 100 ML", name: "Cuadrado de colores", size: "75 ML", ref: "S3133", caja: "75 pzas", p_detal: 70, p_12: 62, p_1caja: 56, p_6cajas: 50, img: "" },
-            { cat: "Frascos de 75 a 100 ML", name: "Torre", size: "80 ML", ref: "DYZ-01X", caja: "60 pzas", p_detal: 70, p_12: 62, p_1caja: 56, p_6cajas: 50, img: "" },
-            { cat: "Frascos de 75 a 100 ML", name: "Singler", size: "100 ML", ref: "3423", caja: "120 pzas", p_detal: 70, p_12: 62, p_1caja: 56, p_6cajas: 50, img: "" },
-            { cat: "Santal 100 Lujo", name: "Santal Lujo", size: "100 ML", ref: "Con tapa, válvula y anillo", caja: "-", p_detal: 175, p_12: 150.50, p_1caja: 137.50, p_6cajas: 119.50, img: "" },
-            { cat: CAT_PREPARADOS, name: "Frasco de Lujo 30 ML", size: "30 ML", ref: "Preparado: $150 | Recarga: $100", caja: "-", p_detal: 150, img: "" },
-            { cat: CAT_PREPARADOS, name: "Frasco de Lujo 50 ML", size: "50 ML", ref: "Preparado: $200 | Recarga: $150", caja: "-", p_detal: 200, img: "" }
+            // FRASCOS DE 30 ML
+            { cat: "Frascos de 30 ML", name: "Zafiro", size: "25 ML", ref: "ZAFIRO", caja: "96 pzas", p_detal: 50, p_12: 41, p_1caja: 38, p_6cajas: 32, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 30 ML", name: "Santal", size: "30 ML", ref: "LZ-495 30ML", caja: "120 pzas", p_detal: 50, p_12: 41, p_1caja: 38, p_6cajas: 32, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 30 ML", name: "Cubo", size: "30 ML", ref: "30ml", caja: "120 pzas", p_detal: 50, p_12: 41, p_1caja: 38, p_6cajas: 32, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 30 ML", name: "Dado", size: "30 ML", ref: "dy115-30ml", caja: "108 pzas", p_detal: 50, p_12: 41, p_1caja: 38, p_6cajas: 32, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 30 ML", name: "Valentino", size: "30 ML", ref: "SGO06", caja: "144 pzas", p_detal: 50, p_12: 41, p_1caja: 38, p_6cajas: 32, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 30 ML", name: "Cristal", size: "30 ML", ref: "dy-555 30ml", caja: "120 pzas", p_detal: 50, p_12: 41, p_1caja: 38, p_6cajas: 32, img: "URL_DE_LA_IMAGEN_AQUI" },
+
+            // FRASCOS DE 50 ML
+            { cat: "Frascos de 50 ML", name: "Cubo", size: "50 ML", ref: "50ml", caja: "120 pzas", p_detal: 60, p_12: 51, p_1caja: 47, p_6cajas: 39, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 50 ML", name: "Dado", size: "50 ML", ref: "dy115-50ml", caja: "96 pzas", p_detal: 60, p_12: 51, p_1caja: 47, p_6cajas: 39, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 50 ML", name: "Valentino", size: "50 ML", ref: "SGO06", caja: "120 pzas", p_detal: 60, p_12: 51, p_1caja: 47, p_6cajas: 39, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 50 ML", name: "Cristal", size: "50 ML", ref: "dy-555", caja: "120 pzas", p_detal: 60, p_12: 51, p_1caja: 47, p_6cajas: 39, img: "URL_DE_LA_IMAGEN_AQUI" },
+
+            // FRASCOS DE 75 A 100 ML
+            { cat: "Frascos de 75 a 100 ML", name: "Cuadrado de colores", size: "75 ML", ref: "S3133", caja: "75 pzas", p_detal: 70, p_12: 62, p_1caja: 56, p_6cajas: 50, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 75 a 100 ML", name: "Torre", size: "80 ML", ref: "DYZ-01X", caja: "60 pzas", p_detal: 70, p_12: 62, p_1caja: 56, p_6cajas: 50, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 75 a 100 ML", name: "Singler", size: "100 ML", ref: "3423", caja: "120 pzas", p_detal: 70, p_12: 62, p_1caja: 56, p_6cajas: 50, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 75 a 100 ML", name: "Gema", size: "100 ML", ref: "DYJ-52P", caja: "70 pzas", p_detal: 70, p_12: 62, p_1caja: 56, p_6cajas: 50, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 75 a 100 ML", name: "Cubo", size: "100 ML", ref: "100ml", caja: "80 pzas", p_detal: 70, p_12: 62, p_1caja: 56, p_6cajas: 50, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: "Frascos de 75 a 100 ML", name: "Valentino", size: "100 ML", ref: "SGO06", caja: "72 pzas", p_detal: 70, p_12: 62, p_1caja: 56, p_6cajas: 50, img: "URL_DE_LA_IMAGEN_AQUI" },
+
+            // SANTAL 100 LUJO
+            { cat: "Santal 100 Lujo", name: "Santal Lujo", size: "100 ML", ref: "Con tapa, válvula y anillo", caja: "-", p_detal: 175, p_12: 150.50, p_1caja: 137.50, p_6cajas: 119.50, img: "URL_DE_LA_IMAGEN_AQUI" },
+
+            // PREPARADOS Y RECARGAS
+            { cat: CAT_PREPARADOS, name: "Frasco de Lujo 30 ML", size: "30 ML", ref: "Preparado: $150 | Recarga: $100", caja: "-", p_detal: 150, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: CAT_PREPARADOS, name: "Frasco de Lujo 50 ML", size: "50 ML", ref: "Preparado: $200 | Recarga: $150", caja: "-", p_detal: 200, img: "URL_DE_LA_IMAGEN_AQUI" },
+            { cat: CAT_PREPARADOS, name: "Frasco de Lujo 75 a 100 ML", size: "75-100 ML", ref: "Preparado: $250 | Recarga: $200", caja: "-", p_detal: 250, img: "URL_DE_LA_IMAGEN_AQUI" }
         ];
 
         // --- ESTADO ---
@@ -526,23 +569,28 @@
         function copyToClipboard(text, label) {
             navigator.clipboard.writeText(text).then(() => {
                 showToast(`${label}: ${text} copiado`);
+            }).catch(() => {
+                showToast("No se pudo copiar");
             });
         }
 
         function filaPrecio(label, costo, margen, isBulk = false) {
             const rowClass = isBulk ? 'class="bulk-row"' : '';
+            const costoStr = money(costo);
+            const ventaStr = calcularVenta(costo, margen);
+            
             return `
                 <tr ${rowClass}>
                     <td>${label}</td>
                     <td class="cost-price">
-                        ${money(costo)}
-                        <button class="copy-btn" onclick="copyToClipboard('${money(costo)}', 'Costo')" title="Copiar costo">
+                        ${costoStr}
+                        <button class="copy-btn" onclick="copyToClipboard('${costoStr}', 'Costo')" title="Copiar costo">
                             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                         </button>
                     </td>
                     <td class="sell-price">
-                        ${calcularVenta(costo, margen)}
-                        <button class="copy-btn" onclick="copyToClipboard('${calcularVenta(costo, margen)}', 'Venta')" title="Copiar venta">
+                        ${ventaStr}
+                        <button class="copy-btn" onclick="copyToClipboard('${ventaStr}', 'Venta')" title="Copiar venta">
                             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                         </button>
                     </td>
@@ -555,7 +603,6 @@
             const contenedor = document.getElementById('catalogo');
             const searchTerm = state.search.toLowerCase();
 
-            // Filtrar productos
             const productosFiltrados = productos.filter(p => 
                 p.name.toLowerCase().includes(searchTerm) || 
                 p.ref.toLowerCase().includes(searchTerm) || 
@@ -580,7 +627,6 @@
             let currentCategory = '';
             let counts = {};
 
-            // Calcular conteos por categoría en los filtrados
             productosFiltrados.forEach(p => {
                 counts[p.cat] = (counts[p.cat] || 0) + 1;
             });
@@ -609,7 +655,7 @@
                 const esPreparado = prod.cat === CAT_PREPARADOS;
                 const ventaClass = state.showVentas ? 'venta-visible' : '';
 
-                const media = prod.img && prod.img !== ""
+                const media = (prod.img && prod.img !== "" && prod.img !== "URL_DE_LA_IMAGEN_AQUI")
                     ? `<img src="${prod.img}" alt="${prod.name}" loading="lazy">`
                     : SVG_PLACEHOLDER;
 
@@ -645,12 +691,7 @@
                                 </thead>
                                 <tbody>${filas}</tbody>
                             </table>
-                            <button class="btn-venta" type="button" onclick="toggleCardVenta(this)" style="
-                                width: 100%; padding: 10px; border-radius: var(--radius-pill); border: 1px solid var(--hairline); 
-                                background: ${state.showVentas ? 'var(--ink-soft)' : 'transparent'}; 
-                                color: ${state.showVentas ? '#fff' : 'var(--ink)'}; 
-                                font-weight: 600; cursor: pointer; transition: all 0.2s;
-                            ">
+                            <button class="btn-venta" type="button" onclick="toggleCardVenta(this)">
                                 ${state.showVentas ? 'Ocultar precio de venta' : 'Mostrar precio de venta'}
                             </button>
                         </div>
@@ -669,13 +710,9 @@
             if (isHidden) {
                 card.classList.add('venta-visible');
                 btn.textContent = 'Ocultar precio de venta';
-                btn.style.background = 'var(--ink-soft)';
-                btn.style.color = '#fff';
             } else {
                 card.classList.remove('venta-visible');
                 btn.textContent = 'Mostrar precio de venta';
-                btn.style.background = 'transparent';
-                btn.style.color = 'var(--ink)';
             }
         }
 
